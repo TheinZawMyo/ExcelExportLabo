@@ -16,5 +16,5 @@ use App\Http\Controllers\HomeController;
 */
 
 Route::get('/', [ExcelController::class, 'index']);
-Route::get('/getEmployee', [HomeController::class, 'getEmployee']);
+Route::get('/getAllData', [HomeController::class, 'getAllData']);
 
