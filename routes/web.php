@@ -17,4 +17,7 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', [ExcelController::class, 'index']);
 Route::get('/getAllData', [HomeController::class, 'getAllData']);
+Route::get('/show_download', [HomeController::class, 'show_download']);
+Route::get('company_export', [HomeController::class, 'company_export'])->name('export');
+
 
