@@ -38,6 +38,25 @@
 
                 <button class="btn btn-primary" id="download">Download</button>
             </div>
+            <div class="row mt-5">
+                <div class="col-auto">
+                    <select class="form-select" aria-label="Default select example">
+                        <option selected>Choose your years</option>
+                        <option value="1">2020</option>
+                        <option value="2">2021</option>
+                        <option value="3">2022</option>
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <a href="{{route('export')}}">
+                        <button type="submit" class="btn btn-primary mb-3">Download Excel</button>
+                    </a>
+                </div>
+            </div>
+
+
+
         </div>
     </div>
 
