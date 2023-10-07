@@ -14,6 +14,12 @@ use App\Http\Controllers\ExcelController;
 |
 */
 
-Route::get('/', [ExcelController::class, 'index']);
+// Route::get('/', [ExcelController::class, 'generateExcel']);
+
+Route::get('/', function() {
+    return view('welcome');
+});
+
+Route::post('/download', [ExcelController::class, 'generateExcel'])->name("download#excel");
 
 
