@@ -65,7 +65,7 @@ class ExcelController extends Controller
     public function generateExcel(Request $request)
     {
         set_time_limit(1200);
-        $selectedYear = 2020;
+        $selectedYear = $request->year;
 
         $employoeeArr = $this->getAllEmployee(); // All Employee
         $companyArr = $this->getEmployeeInfo("82052994-d17a-41ca-8f08-086047b7206e"); // All Company
