@@ -34,7 +34,7 @@ class ExcelController extends Controller
         'disability_type'           => '6f2a1519-973e-48a9-96a9-b8dd12fbfc63',
     ];
 
-    
+
 
     // ============ GET TOKEN FOR AUTH ============ //
     private function getToken()
@@ -53,7 +53,7 @@ class ExcelController extends Controller
         } catch (\Exception $e) {
             Log::error('An error occurred: ' . $e->getMessage());
         }
-        
+
     }
 
     public function changeColumnsToQueryParas($columns)
@@ -78,7 +78,7 @@ class ExcelController extends Controller
         $filteredEmployeeData = array_filter($employoeeArr, function($data) use($selectedYear, $addOnYear){
             $enterDate = NULL;
             $leaveDate = NULL;
-            
+
             foreach($data->fields as $field) {
                 if($field->alias === "EnteredDay") {
                     $enterDate = $field->value;
@@ -88,18 +88,18 @@ class ExcelController extends Controller
                     $leaveDate = $field->value;
                 }
             }
-            
-            return $enterDate < "{$addOnYear}/01/01" && ($leaveDate === NULL || $leaveDate >= "{$selectedYear}/01/01");
+
+            return ($enterDate !== NULL && $enterDate !== "" && $enterDate < "{$addOnYear}/01/01") && ($leaveDate === NULL || $leaveDate >= "{$selectedYear}/01/01");
         });
 
-        
+
         // ====== GET DATA OF EACH EMPLOYEE
         $combinedData = [];
         $filteredDepartment = NULL;
         $row = 2;
 
         $templateFile = public_path('templates/employee_template.xlsx');
-            
+
         $spreadsheet = IOFactory::load($templateFile);
 
         $sheet = $spreadsheet->getActiveSheet();
@@ -119,7 +119,7 @@ class ExcelController extends Controller
             }
 
             $historyData = ($historyResponse->successful()) ? $historyResponse->object()->data : "";
-            
+
             $companyId = NULL;
             $deptId = NULL;
             $positionId = NULL;
@@ -163,12 +163,12 @@ class ExcelController extends Controller
                 return $empStatus->id = $statusId;
             });
 
-            
+
 
             $filteredDepartment = array_filter($departmentArr, function($department) use($deptId) {
                 if(isset($department->items)) {
                     foreach($department->items as $dept) {
-                        
+
                         return $dept->id == $deptId;
                     }
                 }
@@ -180,8 +180,8 @@ class ExcelController extends Controller
             $positionData = array_values($filteredPositionData);
             $empStatusData = array_values($filteredEmploymentData);
 
-            
-            
+
+
             if(empty($historyData)) {
                 $sheet->setCellValue('A'. $row, $employee->fields[0]->value. "". $employee->fields[1]->value);
                 $sheet->setCellValue('B'. $row, isset($companyData[0]->value) ? ($companyData[0]->value) : '-');
@@ -229,7 +229,7 @@ class ExcelController extends Controller
                 }
                 $row --;
             }
-            
+
             $row++;
         }
 
@@ -249,7 +249,7 @@ class ExcelController extends Controller
 
     // ========= Get All employee =========== //
     public function getAllEmployee() {
-    
+
         // $cacheKey = 'all_employees';
         // $cacheMinutes = 60;
         // $cachedData = Cache::get($cacheKey);
@@ -262,12 +262,12 @@ class ExcelController extends Controller
         $employees = [];
         if($token) {
             try {
-                $query_paras = $this->changeColumnsToQueryParas($this->specificColumn); 
+                $query_paras = $this->changeColumnsToQueryParas($this->specificColumn);
                 $endpoint = $this->api. "/members/v1/members?offset=0&limit=100&columns={$query_paras}";
                 $response = Http::withHeaders($token)->get($endpoint);
                 $employees = array_merge($employees, $response->object()->data);
                 $count = intval($response['paging']['totalCount'] / 100);  // count to get all employee from paginated data
-                
+
                 for($i = 1; $i <= $count; $i++){
                     $offset = $i * 100;
                     $endpoint = $this->api. "/members/v1/members?columns={$query_paras}&limit=100&offset={$offset}";

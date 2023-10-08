@@ -38,7 +38,7 @@
 
                 <button class="btn btn-primary" id="download">Download</button>
             </div>
-            <div class="row mt-5">
+            {{-- <div class="row mt-5">
                 <div class="col-auto">
                     <select class="form-select" aria-label="Default select example">
                         <option selected>Choose your years</option>
@@ -53,7 +53,7 @@
                         <button type="submit" class="btn btn-primary mb-3">Download Excel</button>
                     </a>
                 </div>
-            </div>
+            </div> --}}
 
 
 
