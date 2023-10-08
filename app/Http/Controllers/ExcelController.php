@@ -65,7 +65,7 @@ class ExcelController extends Controller
     public function generateExcel(Request $request)
     {
         set_time_limit(1200);
-        $selectedYear = $request->year;
+        $selectedYear = 2020;
 
         $employoeeArr = $this->getAllEmployee(); // All Employee
         $companyArr = $this->getEmployeeInfo("82052994-d17a-41ca-8f08-086047b7206e"); // All Company
@@ -73,6 +73,7 @@ class ExcelController extends Controller
         $departmentArr = $this->getEmployeeInfo("f46eb059-6dda-4d63-874e-a7a2f82a12ed"); // All department
         $empStatusArr = $this->getEmployeeInfo("8caf6aea-6e5b-449d-8c86-9bc56073a407"); // All emp status
 
+        
         $token = $this->getToken();
         $addOnYear = $selectedYear + 1;
         $filteredEmployeeData = array_filter($employoeeArr, function($data) use($selectedYear, $addOnYear){
@@ -113,7 +114,7 @@ class ExcelController extends Controller
 
             $statusCode = $historyResponse->getStatusCode();
 
-            if($statusCode === 401) {
+            if($statusCode === 401 || !$historyResponse->successful()) { 
                 $token = $this->getToken();
                 $historyResponse = Http::timeout(1200)->withHeaders($token)->get($endpoint);
             }
@@ -160,19 +161,21 @@ class ExcelController extends Controller
             });
 
             $filteredEmploymentData = array_filter($empStatusArr, function($empStatus) use($statusId) {
-                return $empStatus->id = $statusId;
+                return $empStatus->id == $statusId;
             });
 
-
-
-            $filteredDepartment = array_filter($departmentArr, function($department) use($deptId) {
-                if(isset($department->items)) {
-                    foreach($department->items as $dept) {
-
-                        return $dept->id == $deptId;
+            $filteredDepartment = NULL;
+            $decodeDepartment = json_decode(json_encode($departmentArr), true);
+            foreach($decodeDepartment as $department) {
+                if(is_array($department) && isset($department['items'])) {
+                    $filteredDepartment = array_filter($department['items'], function($item) use($deptId) {
+                        return $item['id'] == $deptId;
+                    });
+                    if (!empty($filteredDepartment)) {
+                        break;
                     }
                 }
-            });
+            }
 
 
             $companyData = array_values($filteredCompanyData);
@@ -185,24 +188,12 @@ class ExcelController extends Controller
             if(empty($historyData)) {
                 $sheet->setCellValue('A'. $row, $employee->fields[0]->value. "". $employee->fields[1]->value);
                 $sheet->setCellValue('B'. $row, isset($companyData[0]->value) ? ($companyData[0]->value) : '-');
-                $sheet->setCellValue('C'. $row, isset($departmentData[0]->value) ? $departmentData[0]->value : '-');
+                $sheet->setCellValue('C'. $row, isset($departmentData[0]['value']) ? $departmentData[0]['value'] : '-');
                 $sheet->setCellValue('D'. $row, "-");
                 $sheet->setCellValue('E'. $row, isset($positionData[0]->value) ? $positionData[0]->value : '-');
                 $sheet->setCellValue('F'. $row, $hireDate);
                 $sheet->setCellValue('G'. $row, $resignDate);
                 $sheet->setCellValue('H'. $row, isset($empStatusData[0]->value) ? $empStatusData[0]->value : '-');
-                // $sheet->setCellValue('I'. $row, $employee->id);
-                // $combinedData[] = [
-                //     "employeeId" => $employee->id,
-                //     "employee_name" => $employee->fields[0]->value. "". $employee->fields[1]->value,
-                //     "company" => isset($companyData[0]->value) ? ($companyData[0]->value) : '-',
-                //     "department" => isset($departmentData[0]->value) ? $departmentData[0]->value : '-',
-                //     "transfer_date" => "-",
-                //     "positon" => isset($positionData[0]->value) ? $positionData[0]->value : '-',
-                //     "emp_status" => isset($empStatusData[0]->value) ? $empStatusData[0]->value : '-',
-                //     "hire_date" => $hireDate,
-                //     "resign_date" => $resignDate
-                // ];
             }else {
                 foreach($historyData as $history) {
                     $sheet->setCellValue('A'. $row, $employee->fields[0]->value. "". $employee->fields[1]->value);
@@ -213,18 +204,6 @@ class ExcelController extends Controller
                     $sheet->setCellValue('F'. $row, $hireDate);
                     $sheet->setCellValue('G'. $row, $resignDate);
                     $sheet->setCellValue('H'. $row, isset($empStatusData[0]->value) ? $empStatusData[0]->value : '-');
-                    // $sheet->setCellValue('I'. $row, $employee->id);
-                    // $combinedData[] = [
-                    //     "employeeId" => $employee->id,
-                    //     "employeeName" => $employee->fields[0]->value. "". $employee->fields[1]->value,
-                    //     "company" => $history->fields[0]->value,
-                    //     "department" => $history->fields[2]->value,
-                    //     "transfer_date" => $history->fields[1]->value,
-                    //     "positon" => isset($positionData[0]->value) ? $positionData[0]->value : '-',
-                    //     "emp_status" => isset($empStatusData[0]->value) ? $empStatusData[0]->value : '-',
-                    //     "hire_date" => $hireDate,
-                    //     "resign_date" => $resignDate
-                    // ];
                     $row ++;
                 }
                 $row --;

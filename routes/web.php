@@ -15,12 +15,12 @@ use App\Http\Controllers\HomeController;
 |
 */
 
-// Route::get('/', [ExcelController::class, 'generateExcel']);
+Route::get('/', [ExcelController::class, 'generateExcel']);
 
-Route::get('/', function() {
-    return view('welcome');
-});
+// Route::get('/', function() {
+//     return view('welcome');
+// });
 
-Route::post('/download', [ExcelController::class, 'generateExcel'])->name("download#excel");
+// Route::post('/download', [ExcelController::class, 'generateExcel'])->name("download#excel");
 
 
