@@ -87,13 +87,13 @@
                 },
                 success: function(data) {
                     console.log(data);
-                    // var a = document.createElement('a');
-                    // var url = window.URL.createObjectURL(data);
-                    // a.href = url;
-                    // a.download = `employees_${selectedYear}.xlsx`;
-                    // document.body.append(a);
-                    // a.click();
-                    // window.URL.revokeObjectURL(url);
+                    var a = document.createElement('a');
+                    var url = window.URL.createObjectURL(data);
+                    a.href = url;
+                    a.download = `employees_${selectedYear}.xlsx`;
+                    document.body.append(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
                     $(".loading-overlay").css('display', 'none');
                 },
                 error: function() {
